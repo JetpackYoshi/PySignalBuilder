@@ -300,9 +300,28 @@ class SignalBuilder:
         node_locations = [node.time() for node in self._nodes]
         
         return t, np.piecewise(t, condlist, funclist), node_locations
+    
+    def chainConfig(self, start_node):
+        obj = start_node
+        nodes = []
+        pieces = []
+        while 1:
+            
+            if type(obj) is Node:
+                nodes.append(obj)
+                if obj.nType() is 'end':
+                    break  
+                obj = obj.right()
+            if type(obj) is Piece:
+                pieces.append(obj)
+                obj = obj.getEnd()
+        
+        self._nodes = nodes
+        self._pieces = pieces
+        
+    def listConfig(self, nodes, pieces):
+        pass
                 
-                
-               
     
 def genPiecew(t,pieces):
     fun = np.piecewise(t,[piece.valid(t) for piece in pieces],[piece.getFunc().exec_ for piece in pieces])
