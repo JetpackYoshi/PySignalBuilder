@@ -40,9 +40,11 @@ class Node:
         return self._time
 
     def setLeft(self, left_piece):
+        assert type(left_piece) is Piece, "Invalid Type. Must be object of type 'Piece'"
         self._left = left_piece
 
     def setRight(self, right_piece):
+        assert type(right_piece) is Piece, "Invalid Type. Must be object of type 'Piece'"
         self._right = right_piece
 
     def left(self):
@@ -85,16 +87,18 @@ class Piece:
         self._startNode = start_node
 
         if self._startNode is not None:
+            assert type(start_node) is Node, "Invalid Type. Must be object of type 'Node'"
             self._startNode.setRight(self)
             
     def getStart(self):
         return self._startNode
     
 
-    def setEnd(self, end_node):
+    def setEnd(self, end_node): 
         self._endNode = end_node
 
         if self._endNode is not None:
+            assert type(end_node) is Node, "Invalid Type. Must be object of type 'Node'"
             self._endNode.setLeft(self)
             
     def getEnd(self):
