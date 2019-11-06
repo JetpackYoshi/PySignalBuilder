@@ -181,6 +181,50 @@ class Function:
     
     def exec_(self, x):
         raise Exception ("Not Implemented")
+        
+class Function2:
+    _timeRange = [0, 0]
+    _properties = {'amplitude':1,
+                   'frequency':1,
+                   'vShift':0,
+                   'phaseShift':0,
+                   'duty':0.5}
+    
+    def __init__(self):
+        self.__dict = self._properties
+        print(self.amplitude)
+    
+    def setTimeRange(start,end):
+        self._timeRange = [start, end]
+        
+        
+    def __getattr__(self, name):
+        try:
+            return self.__dict[name]
+        except KeyError:
+            msg = "'{0}' object has no attribute '{1}'"
+            raise AttributeError(msg.format(type(self).__name__, name))
+    
+    def exec_(self, x):
+        raise Exception ("Not Implemented")
+        
+class square(Function):
+    def __init__(self,amplitude=1, frequency=1, vertical_shift=0, phase_shift=0, duty_cycle=0.5):
+        self._amplitude = amplitude
+        self._frequency = frequency
+        self._vShift = vertical_shift
+        self._phaseShift = phase_shift
+        self._duty = duty_cycle
+        
+    @property
+    def amplitude(self):
+        return self._amplitude
+    
+#    @amplitude.setter
+#    def 
+    
+    
+    
 class Square(Function):
     def __init__(self,amplitude=1, frequency=1, vertical_shift=0, phase_shift=0, duty_cycle=0.5):
         self._amplitude = amplitude
