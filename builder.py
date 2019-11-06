@@ -105,7 +105,7 @@ class Piece:
         return self._endNode
 
     def valid(self, x):
-        return (x >= self._startNode.time()) & (x<self._endNode.time())
+        return (x >= self._startNode.time()) & (x <= self._endNode.time())
 
 
 class Sinusoid:
