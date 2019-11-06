@@ -120,11 +120,6 @@ class square(Function):
     def amplitude(self):
         return self._amplitude
     
-#    @amplitude.setter
-#    def 
-    
-    
-    
 class Square(Function):
     def __init__(self,amplitude=1, frequency=1, vertical_shift=0, phase_shift=0, duty_cycle=0.5):
         self._amplitude = amplitude
