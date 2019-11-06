@@ -6,61 +6,77 @@ Created on Mon Nov  4 21:18:49 2019
 """
 
 import matplotlib.pyplot as plt
-#from bisect import bisect
-#from scipy import interpolate, signal
+from bisect import bisect
+from scipy import interpolate, signal
 import numpy as np
-#from collections import deque, OrderedDict
-#import itertools
+from collections import deque, OrderedDict
+import itertools
 from functions import *
 
 
 class Node:
+    _time = None
     _left = None
     _right = None
+    _nType = 'normal'
 
     def __init__(self, time=None, left_piece=None, right_piece=None, nType='normal'):
-        self.left = left_piece
-        self.right = right_piece
+        if left_piece is not None:
+            self.setLeft(left_piece)
+        else:
+            self._left = None
+
+        if right_piece is not None:
+            self.setRight(right_piece)
+        else:
+            self._right = None
+
         self.nType = nType
         self.time = time
 
-    def getTime(self):
-        return self.__time
+    @property
+    def time(self):
+        return self._time
 
-    def setTime(self, time):
-        self.__time = time
+    @time.setter
+    def time(self, time):
+        self._time = time
 
-    def getnType(self):
-        return self.__nType
+    @property
+    def nType(self):
+        return self._nType
 
-    def setnType(self, nType):
-        self.__nType = nType
+    @nType.setter
+    def nType(self, nType):
+        self._nType = nType
 
-    def getLeft(self):
+    @property
+    def left(self):
         return self._left
 
-    def setLeft(self, left_piece):
+    @left.setter
+    def left(self, left_piece):
         self._left = left_piece
         
         if self._left is not None:
             assert type(left_piece) is Piece, "Invalid Type. Must be object of type 'Piece'"
             self._left._end = self
 
-    def getRight(self):
+    @property
+    def right(self):
         return self._right
 
-    def setRight(self, right_piece):
+    @right.setter
+    def right(self, right_piece):
         self._right = right_piece
         if self._right is not None:
             assert type(right_piece) is Piece, "Invalid Type. Must be object of type 'Piece'"
             self._right._start = self
 
-    time = property(getTime, setTime)
-    left = property(getLeft, setLeft)
-    right = property(getRight, setRight)
-    nType = property(getnType, setnType)
 
 class Piece:
+    fType = None
+    _fType = 'constant'
     _start = None
     _end = None
 
@@ -83,32 +99,38 @@ class Piece:
         if fType is not None:
             return self._funcs[fType]
         else:
-            return self._funcs[self.__fType]
+            return self._funcs[self._fType]
 
     @property
     def func(self):
-        return self._funcs[self.__fType]
+        return self._funcs[self._fType]
 
-    def getfType(self):
-        return self.__fType
+    @property
+    def fType(self):
+        return self._fType
 
-    def setfType(self, fType):
-        self.__fType = fType
+    @fType.setter
+    def fType(self, fType):
+        self._fType = fType
 
-    def getStart(self):
+    @property
+    def start(self):
         return self._startNode
 
-    def setStart(self, start_node):
+    @start.setter
+    def start(self, start_node):
         self._startNode = start_node
 
         if self._startNode is not None:
             assert type(start_node) is Node, "Invalid Type. Must be object of type 'Node'"
             self._startNode._right = self
 
-    def getEnd(self):
+    @property
+    def end(self):
         return self._endNode
 
-    def setEnd(self, end_node):
+    @end.setter
+    def end(self, end_node):
         self._endNode = end_node
 
         if self._endNode is not None:
@@ -118,9 +140,6 @@ class Piece:
     def valid(self, x):
         return (x >= self._startNode.time) & (x <= self._endNode.time)
 
-    fType = property(getfType, setfType, doc = "Type of signal to be executed by piece")
-    start = property(getStart, setStart, doc = "Start Node")
-    end = property(getEnd, setEnd, doc = "End Node")
 
 class SignalBuilder:
     _startNode = Node(nType='start')
@@ -129,10 +148,8 @@ class SignalBuilder:
     _pieces = [Piece(_startNode, _endNode)]
     _sampleFrequency = None
 
-    def __init__(self, start_time=0, end_time=10, sample_frequency=50):
-        self.signalStart = start_time
-        self.signalEnd = end_time
-        self.sampleFrequency = sample_frequency
+    def __init__(self):
+        pass
     
     @property
     def sampleFrequency(self):
@@ -364,7 +381,7 @@ if __name__ == '__main__':
         plt.axvline(x=xc, linewidth=0.5, linestyle='--')
     plt.show()
     
-    S.deleteNode(3, False)
+    S.deleteNode(5, False)
     
     t, Y, nodes = S.genPiecew()
     plt.plot(t, Y, '-', t, Y, '.')
