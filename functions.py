@@ -8,6 +8,28 @@ Created on Tue Nov  5 22:33:35 2019
 from scipy import interpolate, signal
 import numpy as np
 
+class Descriptor(object):
+    
+    def __init__(self, label):
+        self.label = label
+        
+    def __get__(self, instance, owner):
+        #print '__get__', instance, owner
+        return instance.__dict__.get(self.label)
+    
+    def __set__(self, instance, value):
+        #print '__set__'
+        instance.__dict__[self.label] = value
+
+        
+class DescriptorOwner(type):
+    def __new__(cls, name, bases, attrs):
+        # find all descriptors, auto-set their labels
+        for n, v in attrs.items():
+            if isinstance(v, Descriptor):
+                v.label = n
+        return super(DescriptorOwner, cls).__new__(cls, name, bases, attrs)
+    
 class Sinusoid:
     def __init__(self, amplitude=1, frequency=1, vertical_shift=0, phase_shift=0):
         self._amplitude = amplitude
@@ -109,44 +131,55 @@ class Function2:
         raise Exception ("Not Implemented")
         
 class square(Function):
+    #__metaclass__ = DescriptorOwner
+    amplitude = property()
+    frequency = property()
+    vShift = property()
+    phaseShift = property()
+    duty = property()
+
     def __init__(self,amplitude=1, frequency=1, vertical_shift=0, phase_shift=0, duty_cycle=0.5):
-        self._amplitude = amplitude
-        self._frequency = frequency
-        self._vShift = vertical_shift
-        self._phaseShift = phase_shift
-        self._duty = duty_cycle
+        self.amplitude = amplitude
+        self.frequency = frequency
+        self.vShift = vertical_shift
+        self.phaseShift = phase_shift
+        self.duty = duty_cycle
         
-    @property
-    def amplitude(self):
-        return self._amplitude
-    
-#    @amplitude.setter
-#    def 
-    
+    def exec_(self, x):
+        return self.amplitude*signal.square(2 * np.pi * self.frequency * (x - self.phaseShift), duty=self.duty) + self.vShift
     
     
 class Square(Function):
+    
+    
     def __init__(self,amplitude=1, frequency=1, vertical_shift=0, phase_shift=0, duty_cycle=0.5):
-        self._amplitude = amplitude
-        self._frequency = frequency
-        self._vShift = vertical_shift
-        self._phaseShift = phase_shift
-        self._duty = duty_cycle
+        self.amplitude = amplitude
+        self.frequency = frequency
+        self.vShift = vertical_shift
+        self.phaseShift = phase_shift
+        self.duty = duty_cycle
         
     def setAmplitude(self, amplitude):
-        self._amplitude = amplitude
+        self.__amplitude = amplitude
 
     def setFrequency(self, frequency):
-        self._frequency = frequency
+        self.__frequency = frequency
 
     def setVShift(self, vertical_shift):
-        self._vShift = vertical_shift
+        self.__vShift = vertical_shift
 
     def setPhase(self, phase_shift):
-        self._phaseShift = phase_shift
+        self.__phaseShift = phase_shift
         
     def setDutyCycle(self, duty):
-        self._duty = duty
+        self.__duty = duty
         
     def exec_(self, x):
-        return self._amplitude*signal.square(2 * np.pi * self._frequency * (x - self._phaseShift), duty=self._duty) + self._vShift
+        return self.__amplitude*signal.square(2 * np.pi * self.__frequency * (x - self.__phaseShift), duty=self.__duty) + self.__vShift
+    
+    amplitude = property(fset=setAmplitude)
+    frequency = property(fset=setFrequency)
+    vShift = property(fset=setVShift)
+    phaseShift = property(fset=setPhase)
+    duty = property(fset=setDutyCycle)
+    
