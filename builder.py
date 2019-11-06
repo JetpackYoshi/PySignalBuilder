@@ -219,14 +219,28 @@ class SignalBuilder:
         newPiece.end = self._nodes[index + 1]
 
     def deleteNode(self, index, right=True):
+        assert index != 0 and index != len(self._nodes)-1, "Cannot Delete Start or End Node"
         delNode = self._nodes[index]
 
         if right:
-            delPiece = delNode.right()
-            oldPiece = delNode.left()
-            oldNode = delPiece.getEnd()
+            delPiece = delNode.right
+            oldPiece = delNode.left
+            oldNode = delPiece.end
+            
+            # Link together remaining unlinked node and piece
+            oldPiece.end = oldNode
+              
         else:
-            delPiece = delNode.left()
+            delPiece = delNode.left
+            oldPiece = delNode.right
+            oldNode = delPiece.start
+            
+            # Link together remaining unlinked node and piece
+            oldPiece.start = oldNode
+        
+        self._nodes.remove(delNode)
+        self._pieces.remove(delPiece)
+        
 
     def trace(self, report=False):
         obj = self._startNode
@@ -361,6 +375,14 @@ if __name__ == '__main__':
     pieces[4].fType = 'ramp'
     pieces[4].getFunc().setTimeRange([8, 10])
 
+    t, Y, nodes = S.genPiecew()
+    plt.plot(t, Y, '-', t, Y, '.')
+    for xc in nodes:
+        plt.axvline(x=xc, linewidth=0.5, linestyle='--')
+    plt.show()
+    
+    S.deleteNode(5, False)
+    
     t, Y, nodes = S.genPiecew()
     plt.plot(t, Y, '-', t, Y, '.')
     for xc in nodes:
