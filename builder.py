@@ -7,7 +7,7 @@ Created on Mon Nov  4 21:18:49 2019
 
 import matplotlib.pyplot as plt
 from bisect import bisect
-from scipy import interpolate
+from scipy import interpolate, signal
 import numpy as np
 from collections import deque, OrderedDict
 import itertools
@@ -61,7 +61,7 @@ class Piece:
                 'constant': Constant(),
                 'ramp': Ramp(),
                 'sinusoid': Sinusoid(),
-                'square': None
+                'square': Square()
                 }
         
         self.setfType(fType)
@@ -131,9 +131,6 @@ class Sinusoid:
         y = self._amplitude * np.sin((2 * np.pi * self._frequency) * (x - self._phaseShift)) + self._vShift
         return y
 
-class Square:
-    pass
-
 
 class Ramp:
     def __init__(self, startVal=0, rate=1, endVal=1, mode='rate'):
@@ -184,6 +181,31 @@ class Function:
     
     def exec_(self, x):
         raise Exception ("Not Implemented")
+class Square(Function):
+    def __init__(self,amplitude=1, frequency=1, vertical_shift=0, phase_shift=0, duty_cycle=0.5):
+        self._amplitude = amplitude
+        self._frequency = frequency
+        self._vShift = vertical_shift
+        self._phaseShift = phase_shift
+        self._duty = duty_cycle
+        
+    def setAmplitude(self, amplitude):
+        self._amplitude = amplitude
+
+    def setFrequency(self, frequency):
+        self._frequency = frequency
+
+    def setVShift(self, vertical_shift):
+        self._vShift = vertical_shift
+
+    def setPhase(self, phase_shift):
+        self._phaseShift = phase_shift
+        
+    def setDutyCycle(self, duty):
+        self._duty = duty
+        
+    def exec_(self, x):
+        return self._amplitude*signal.square(2 * np.pi * self._frequency * (x - self._phaseShift), duty=self._duty) + self._vShift
     
 class SignalBuilder:
     _startNode = Node(nType='start')
@@ -377,13 +399,14 @@ if __name__ == '__main__':
     pieces = S.getPieces()
     pieces[1].getFunc().setValue(2)
     pieces[3].getFunc().setValue(-2.5)
-    pieces[2].setfType('sinusoid')
+    pieces[2].setfType('square')
     pieces[2].getFunc().setAmplitude(0.5)
+    pieces[2].getFunc().setDutyCycle(0.7)
     pieces[4].setfType('ramp')
     pieces[4].getFunc().setTimeRange([8,10])
     
     t, Y, nodes = S.genPiecew()
-    plt.plot(t,Y)
+    plt.plot(t,Y,'-',t,Y,'.')
     for xc in nodes:
         plt.axvline(x=xc, linewidth=0.5, linestyle='--')
     plt.show()
