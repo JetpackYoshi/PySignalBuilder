@@ -5,13 +5,8 @@ Created on Mon Nov  4 21:18:49 2019
 @author: Yoshin
 """
 
-import matplotlib.pyplot as plt
-from bisect import bisect
-from scipy import interpolate, signal
+from SignalBuilder.functions import *
 import numpy as np
-from collections import deque, OrderedDict
-import itertools
-from functions import *
 
 
 class Node:
@@ -75,7 +70,6 @@ class Node:
 
 
 class Piece:
-    fType = None
     _fType = 'constant'
     _start = None
     _end = None
@@ -326,6 +320,8 @@ def genPiecew(t, pieces):
 
 
 if __name__ == '__main__':
+    import matplotlib.pyplot as plt
+
     start_time = 0
     end_time = 10
     freq = 500
@@ -381,7 +377,7 @@ if __name__ == '__main__':
         plt.axvline(x=xc, linewidth=0.5, linestyle='--')
     plt.show()
     
-    S.deleteNode(5, False)
+    S.deleteNode(4, False)
     
     t, Y, nodes = S.genPiecew()
     plt.plot(t, Y, '-', t, Y, '.')
