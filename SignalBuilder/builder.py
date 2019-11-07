@@ -280,7 +280,6 @@ class SignalBuilder:
                 print("----\n")
 
     def genPiecew(self):
-        print(self._endNode.time)
         num_samples = (self._endNode.time - self._startNode.time) * self._sampleFrequency
         t = np.linspace(self._startNode.time, self._endNode.time, num=num_samples)
 

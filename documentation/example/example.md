@@ -1,39 +1,3 @@
- PySignalBuilder 
-================
-
-[![Build Status](https://travis-ci.org/JetpackYoshi/PySignalBuilder.svg?branch=master)](https://travis-ci.org/JetpackYoshi/PySignalBuilder/)
-
-Overview
-========
-This [Python] package allows for the creation
-and on-the-fly modification of piecewise linear systems.
-It utilizes the open-source [Numpy] library and it is supported
-on Linux, Windows, and OSX.
-
-For automation, testing, and control, it is often necessary to pre-generate signals and
-setpoints to make changes based on time. Whether it's actuator movement, voltage output, or
-attribute control, it is often necessary to pre-script automation curves. While simple
-time-dependent signals aren't too difficult to generate by programatically or by hand,
-complex and compound signals can become exponentially difficult to work with on-the fly.
-This library helps simplify that.
-
-- Project Homepage: https://github.com/JetpackYoshi/PySignalBuilder
-
-MIT license, (C) 2019-Present Yoshin Govender <yoshin.govender@gmail.com>
-
-
-Documentation
-=============
-SignalBuilder works on the concept of piecewise signals, which consist of various functions
-along with a domain in where it applies.
-
-<a href="https://www.codecogs.com/eqnedit.php?latex=f(t)&space;=&space;\left\{\begin{matrix}&space;t&plus;3,&space;t<-2&space;&&space;\\&space;-sin(t),&space;-2\leq&space;t<3&space;&&space;\\&space;-2,&space;t\geq&space;3&&space;\end{matrix}\right." target="_blank"><img src="https://latex.codecogs.com/gif.latex?f(t)&space;=&space;\left\{\begin{matrix}&space;t&plus;3,&space;t<-2&space;&&space;\\&space;-sin(t),&space;-2\leq&space;t<3&space;&&space;\\&space;-2,&space;t\geq&space;3&&space;\end{matrix}\right." title="f(t) = \left\{\begin{matrix} t+3, t<-2 & \\ -sin(t), -2\leq t<3 & \\ -2, t\geq 3& \end{matrix}\right." /></a>
-
-The SignalBuilder class allows a user to generate a function that incorporates these conditions,
-which can be used to generate automation arrays at whatever frequency is desired.
-
-Use
-===
 
 Import Signal Builder and create an instance of the SignalBuilder class.
 
@@ -69,17 +33,17 @@ S.report()
         <SignalBuilder.builder.Node object at 0x10dc01c18>
         time: 0
     ----
-
+    
     Piece:
         <SignalBuilder.builder.Piece object at 0x10dc93080>
         Type: constant
     ----
-
+    
     End Node:
         <SignalBuilder.builder.Node object at 0x10dc01eb8>
         time: 10
     ----
-
+    
 
 
 By default, there are three objects present in out signal chain: two nodes and a piece.
@@ -98,7 +62,7 @@ import numpy as np
 
 num_samples = (end_time - start_time) * freq
 t = np.linspace(start_time, end_time, num=num_samples)
-
+    
 def show_signal():
     t, Y, nodes = S.genPiecew()
     plt.plot(t, Y, '-', color='k')
@@ -113,7 +77,7 @@ show_signal()
 ```
 
 
-![png](documentation/img/output_8_0.png)
+![png](../img/output_8_0.png)
 
 
 The vertical dotted line represents the location of the nodes present in the signal, which right now are the start and end nodes.
@@ -143,57 +107,57 @@ S.report()
         <SignalBuilder.builder.Node object at 0x10dc01c18>
         time: 0
     ----
-
+    
     Piece:
         <SignalBuilder.builder.Piece object at 0x10dc93080>
         Type: constant
     ----
-
+    
     Node:
         <SignalBuilder.builder.Node object at 0x1c1ed80d68>
         time: 1.5
     ----
-
+    
     Piece:
         <SignalBuilder.builder.Piece object at 0x1c1ed80e80>
         Type: constant
     ----
-
+    
     Node:
         <SignalBuilder.builder.Node object at 0x1c1ed80438>
         time: 3.5
     ----
-
+    
     Piece:
         <SignalBuilder.builder.Piece object at 0x1c1ed80e48>
         Type: constant
     ----
-
+    
     Node:
         <SignalBuilder.builder.Node object at 0x1c1dcdeb00>
         time: 6
     ----
-
+    
     Piece:
         <SignalBuilder.builder.Piece object at 0x1c1ed80470>
         Type: constant
     ----
-
+    
     Node:
         <SignalBuilder.builder.Node object at 0x1c1ed80b00>
         time: 8
     ----
-
+    
     Piece:
         <SignalBuilder.builder.Piece object at 0x1c1ed80ef0>
         Type: constant
     ----
-
+    
     End Node:
         <SignalBuilder.builder.Node object at 0x10dc01eb8>
         time: 10
     ----
-
+    
 
 
 
@@ -202,7 +166,7 @@ show_signal()
 ```
 
 
-![png](documentation/img/output_13_0.png)
+![png](../img/output_13_0.png)
 
 
 We can now grab those pieces and modify each one as we wish.
@@ -227,7 +191,7 @@ show_signal()
 ```
 
 
-![png](documentation/img/output_16_0.png)
+![png](../img/output_16_0.png)
 
 
 To move a node, use the **setNodeTime** method
@@ -243,10 +207,10 @@ show_signal()
 ```
 
 
-![png](documentation/img/output_18_0.png)
+![png](../img/output_18_0.png)
 
 
-You can also delete nodes using the **deleteNode** method.
+You can also delete nodes using the **deleteNode** method. 
 ```python
 deleteNode(index, right=True)
 ```
@@ -259,7 +223,7 @@ show_signal()
 ```
 
 
-![png](documentation/img/output_20_0.png)
+![png](../img/output_20_0.png)
 
 
 By default, the piece to the right of the piece is deleted.
@@ -273,24 +237,5 @@ show_signal()
 ```
 
 
-![png](documentation/img/output_22_0.png)
+![png](../img/output_22_0.png)
 
-
-Examples
-========
-Examples and unit tests are in the directory [examples].
-
-
-Installation
-============
-Navigate into directory
-``cd PySignalBuilder``
-
-Install using
-``python setup.py install``
-
-[//]: # 
-
-   [examples]: https://github.com/JetpackYoshi/PySignalBuilder/blob/master/examples
-   [Python]: http://python.org/
-   [Numpy]: https://pypi.org/project/numpy/
