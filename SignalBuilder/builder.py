@@ -7,24 +7,22 @@ Created on Mon Nov  4 21:18:49 2019
 
 from SignalBuilder.functions import *
 import numpy as np
+import enum
 
 class Node:
+    class Types(enum.Enum):
+        NORMAL = 0
+        START = 1
+        END = 2
+
     _time = None
     _left = None
     _right = None
-    _nType = 'normal'
+    _nType = Types.NORMAL
 
-    def __init__(self, time=None, left_piece=None, right_piece=None, nType='normal'):
-        if left_piece is not None:
-            self.setLeft(left_piece)
-        else:
-            self._left = None
-
-        if right_piece is not None:
-            self.setRight(right_piece)
-        else:
-            self._right = None
-
+    def __init__(self, time=None, left_piece=None, right_piece=None, nType=Types.NORMAL):
+        self.left = left_piece
+        self.right = right_piece
         self.nType = nType
         self.time = time
 
@@ -135,8 +133,8 @@ class Piece:
 
 
 class SignalBuilder:
-    _startNode = Node(nType='start')
-    _endNode = Node(nType='end')
+    _startNode = Node(nType=Node.Types.START)
+    _endNode = Node(nType=Node.Types.END)
     _nodes = [_startNode, _endNode]
     _pieces = [Piece(_startNode, _endNode)]
     _sampleFrequency = None
@@ -171,6 +169,7 @@ class SignalBuilder:
         self.setNodeTime(len(self._nodes) - 1, t)
 
     def setNodeTime(self, index, t):
+        assert not self.nodeLocExists(t, index), "A node with that time already exists!"
         myNode = self._nodes[index]
 
         left = None
@@ -201,6 +200,7 @@ class SignalBuilder:
 
     def insertNode(self, index, t=None):
         assert 0 < index < len(self._nodes), "Invalid Node Index"
+        assert not self.nodeLocExists(t), "A node with that time already exists!"
         newNode = Node(time=t)
         newPiece = Piece()
         newPiece.start = newNode
@@ -233,7 +233,16 @@ class SignalBuilder:
         
         self._nodes.remove(delNode)
         self._pieces.remove(delPiece)
-        
+
+        del(delNode)
+        del(delPiece)
+
+    def clear(self):
+        for i in range(1,len(self._nodes)-1):
+            self.deleteNode(1)
+
+        self._startNode.time = None
+        self._endNode.time = None
 
     def trace(self, report=False):
         obj = self._startNode
@@ -242,7 +251,7 @@ class SignalBuilder:
 
             if type(obj) is Node:
                 trace.append(obj)
-                if obj.nType is 'end':
+                if obj.nType is Node.Types.END:
                     break
                 obj = obj.right
             if type(obj) is Piece:
@@ -263,9 +272,9 @@ class SignalBuilder:
     def report(self):
         for item in self.trace():
             if type(item) is Node:
-                if item.nType is 'start':
+                if item.nType is Node.Types.START:
                     print("Start Node:")
-                elif item.nType is 'end':
+                elif item.nType is Node.Types.END:
                     print("End Node:")
                 else:
                     print("Node:")
@@ -278,6 +287,18 @@ class SignalBuilder:
                 print("    {}".format(item))
                 print("    Type: {}".format(item.fType))
                 print("----\n")
+
+    def nodeLocExists(self, loc, exclusionIdx=[]):
+        #print('Excluding:', exclusionIdx)
+        if type(exclusionIdx) is not list:
+            exclusionIdx = [exclusionIdx]
+        foo = [loc for idx, loc in enumerate(self.getNodeLocations()) if idx not in exclusionIdx]
+        #print('locations being checked:', foo)
+        return loc in foo
+
+    def getNodeLocations(self):
+        node_locations = [node.time for node in self._nodes]
+        return node_locations
 
     def genPiecew(self):
         num_samples = (self._endNode.time - self._startNode.time) * self._sampleFrequency
@@ -298,7 +319,7 @@ class SignalBuilder:
 
             if type(obj) is Node:
                 nodes.append(obj)
-                if obj.nType is 'end':
+                if obj.nType is Node.Types.END:
                     break
                 obj = obj.right()
             if type(obj) is Piece:
