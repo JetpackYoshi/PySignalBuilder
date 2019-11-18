@@ -8,6 +8,13 @@ Created on Tue Nov  5 22:33:35 2019
 from scipy import interpolate, signal
 import numpy as np
 
+# func_dict = {
+#     'constant': Constant(),
+#     'ramp': Ramp(),
+#     'sinusoid': Sinusoid(),
+#     'square': Square()
+#     }
+
 class Sinusoid:
     def __init__(self, amplitude=1, frequency=1, vertical_shift=0, phase_shift=0):
         self._amplitude = amplitude
