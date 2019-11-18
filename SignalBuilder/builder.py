@@ -15,12 +15,12 @@ class Node:
         START = 1
         END = 2
 
-    _time = None
-    _left = None
-    _right = None
-    _nType = Types.NORMAL
-
     def __init__(self, time=None, left_piece=None, right_piece=None, nType=Types.NORMAL):
+        self._time = None
+        self._left = None
+        self._right = None
+        self._nType = None
+
         self.left = left_piece
         self.right = right_piece
         self.nType = nType
@@ -67,11 +67,12 @@ class Node:
 
 
 class Piece:
-    _fType = 'constant'
-    _start = None
-    _end = None
 
     def __init__(self, start_node=None, end_node=None, fType='constant'):
+        self._fType = None
+        self._start = None
+        self._end = None
+
         self._funcs = {
             'constant': Constant(),
             'ramp': Ramp(),
@@ -133,14 +134,13 @@ class Piece:
 
 
 class SignalBuilder:
-    _startNode = Node(nType=Node.Types.START)
-    _endNode = Node(nType=Node.Types.END)
-    _nodes = [_startNode, _endNode]
-    _pieces = [Piece(_startNode, _endNode)]
-    _sampleFrequency = None
 
     def __init__(self):
-        pass
+        self._startNode = Node(nType=Node.Types.START)
+        self._endNode = Node(nType=Node.Types.END)
+        self._nodes = [self._startNode, self._endNode]
+        self._pieces = [Piece(self._startNode, self._endNode)]
+        self._sampleFrequency = None
     
     @property
     def sampleFrequency(self):
@@ -237,12 +237,13 @@ class SignalBuilder:
         del(delNode)
         del(delPiece)
 
-    def clear(self):
+    def clear(self, endpointTimes=True):
         for i in range(1,len(self._nodes)-1):
             self.deleteNode(1)
 
-        self._startNode.time = None
-        self._endNode.time = None
+        if endpointTimes:
+            self._startNode.time = None
+            self._endNode.time = None
 
     def trace(self, report=False):
         obj = self._startNode
@@ -301,6 +302,7 @@ class SignalBuilder:
         return node_locations
 
     def genPiecew(self):
+        assert len(self.checkNodeTimes()) == 0, "Cannot Generate Function, all nodes must have a position value assigned."
         num_samples = (self._endNode.time - self._startNode.time) * self._sampleFrequency
         t = np.linspace(self._startNode.time, self._endNode.time, num=num_samples)
 
