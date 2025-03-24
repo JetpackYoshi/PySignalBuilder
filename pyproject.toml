@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "PySignalBuilder"
+version = "0.1"
+authors = [
+  { name="Yoshika Govender", email="yoshi.govender@gmail.com" },
+]
+description = "Python library for creating piecewise linear signals"
+readme = "README.md"
+requires-python = ">=3.8"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+    "License :: OSI Approved :: MIT License",
+]
+dependencies = [
+    "numpy",
+    "scipy",
+    "matplotlib"
+]
