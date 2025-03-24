@@ -4,6 +4,7 @@ S = SignalBuilder()
 start_time = 0
 end_time = 10
 S.signalStart = start_time
+S.report()
 S.signalEnd = end_time
 
 S.report()
@@ -39,6 +40,7 @@ y = np.zeros(num_samples)
 
 # Plot
 t, Y, nodes = S.genPiecew()
+print(nodes)
 plt.plot(t, Y, '-', color='k')
 for xc in nodes:
     plt.axvline(x=xc, linewidth=0.5, linestyle='--', color='m')
@@ -48,6 +50,7 @@ plt.show()
 S.setNodeTime(1, 2)
 
 t, Y, nodes = S.genPiecew()
+print(nodes)
 plt.plot(t, Y, '-', color='k')
 for xc in nodes:
     plt.axvline(x=xc, linewidth=0.5, linestyle='--', color='m')
@@ -57,7 +60,9 @@ plt.show()
 S.deleteNode(4)
 
 t, Y, nodes = S.genPiecew()
+print(nodes)
 plt.plot(t, Y, '-', color='k')
 for xc in nodes:
     plt.axvline(x=xc, linewidth=0.5, linestyle='--', color='m')
 plt.show()
+

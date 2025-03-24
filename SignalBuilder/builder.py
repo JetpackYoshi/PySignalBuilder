@@ -7,24 +7,22 @@ Created on Mon Nov  4 21:18:49 2019
 
 from SignalBuilder.functions import *
 import numpy as np
+import enum
 
 class Node:
-    _time = None
-    _left = None
-    _right = None
-    _nType = 'normal'
+    class Types(enum.Enum):
+        NORMAL = 0
+        START = 1
+        END = 2
 
-    def __init__(self, time=None, left_piece=None, right_piece=None, nType='normal'):
-        if left_piece is not None:
-            self.setLeft(left_piece)
-        else:
-            self._left = None
+    def __init__(self, time=None, left_piece=None, right_piece=None, nType=Types.NORMAL):
+        self._time = None
+        self._left = None
+        self._right = None
+        self._nType = None
 
-        if right_piece is not None:
-            self.setRight(right_piece)
-        else:
-            self._right = None
-
+        self.left = left_piece
+        self.right = right_piece
         self.nType = nType
         self.time = time
 
@@ -69,11 +67,12 @@ class Node:
 
 
 class Piece:
-    _fType = 'constant'
-    _start = None
-    _end = None
 
     def __init__(self, start_node=None, end_node=None, fType='constant'):
+        self._fType = None
+        self._start = None
+        self._end = None
+
         self._funcs = {
             'constant': Constant(),
             'ramp': Ramp(),
@@ -135,14 +134,13 @@ class Piece:
 
 
 class SignalBuilder:
-    _startNode = Node(nType='start')
-    _endNode = Node(nType='end')
-    _nodes = [_startNode, _endNode]
-    _pieces = [Piece(_startNode, _endNode)]
-    _sampleFrequency = None
 
     def __init__(self):
-        pass
+        self._startNode = Node(nType=Node.Types.START)
+        self._endNode = Node(nType=Node.Types.END)
+        self._nodes = [self._startNode, self._endNode]
+        self._pieces = [Piece(self._startNode, self._endNode)]
+        self._sampleFrequency = None
     
     @property
     def sampleFrequency(self):
@@ -171,6 +169,7 @@ class SignalBuilder:
         self.setNodeTime(len(self._nodes) - 1, t)
 
     def setNodeTime(self, index, t):
+        assert not self.nodeLocExists(t, index), "A node with that time already exists!"
         myNode = self._nodes[index]
 
         left = None
@@ -201,6 +200,7 @@ class SignalBuilder:
 
     def insertNode(self, index, t=None):
         assert 0 < index < len(self._nodes), "Invalid Node Index"
+        assert not self.nodeLocExists(t), "A node with that time already exists!"
         newNode = Node(time=t)
         newPiece = Piece()
         newPiece.start = newNode
@@ -233,7 +233,17 @@ class SignalBuilder:
         
         self._nodes.remove(delNode)
         self._pieces.remove(delPiece)
-        
+
+        del(delNode)
+        del(delPiece)
+
+    def clear(self, endpointTimes=True):
+        for i in range(1,len(self._nodes)-1):
+            self.deleteNode(1)
+
+        if endpointTimes:
+            self._startNode.time = None
+            self._endNode.time = None
 
     def trace(self, report=False):
         obj = self._startNode
@@ -242,7 +252,7 @@ class SignalBuilder:
 
             if type(obj) is Node:
                 trace.append(obj)
-                if obj.nType is 'end':
+                if obj.nType is Node.Types.END:
                     break
                 obj = obj.right
             if type(obj) is Piece:
@@ -263,9 +273,9 @@ class SignalBuilder:
     def report(self):
         for item in self.trace():
             if type(item) is Node:
-                if item.nType is 'start':
+                if item.nType is Node.Types.START:
                     print("Start Node:")
-                elif item.nType is 'end':
+                elif item.nType is Node.Types.END:
                     print("End Node:")
                 else:
                     print("Node:")
@@ -279,7 +289,20 @@ class SignalBuilder:
                 print("    Type: {}".format(item.fType))
                 print("----\n")
 
+    def nodeLocExists(self, loc, exclusionIdx=[]):
+        #print('Excluding:', exclusionIdx)
+        if type(exclusionIdx) is not list:
+            exclusionIdx = [exclusionIdx]
+        foo = [loc for idx, loc in enumerate(self.getNodeLocations()) if idx not in exclusionIdx]
+        #print('locations being checked:', foo)
+        return loc in foo
+
+    def getNodeLocations(self):
+        node_locations = [node.time for node in self._nodes]
+        return node_locations
+
     def genPiecew(self):
+        assert len(self.checkNodeTimes()) == 0, "Cannot Generate Function, all nodes must have a position value assigned."
         num_samples = (self._endNode.time - self._startNode.time) * self._sampleFrequency
         t = np.linspace(self._startNode.time, self._endNode.time, num=num_samples)
 
@@ -298,7 +321,7 @@ class SignalBuilder:
 
             if type(obj) is Node:
                 nodes.append(obj)
-                if obj.nType is 'end':
+                if obj.nType is Node.Types.END:
                     break
                 obj = obj.right()
             if type(obj) is Piece:

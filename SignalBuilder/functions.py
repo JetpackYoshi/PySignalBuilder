@@ -8,6 +8,13 @@ Created on Tue Nov  5 22:33:35 2019
 from scipy import interpolate, signal
 import numpy as np
 
+# func_dict = {
+#     'constant': Constant(),
+#     'ramp': Ramp(),
+#     'sinusoid': Sinusoid(),
+#     'square': Square()
+#     }
+
 class Sinusoid:
     def __init__(self, amplitude=1, frequency=1, vertical_shift=0, phase_shift=0):
         self._amplitude = amplitude
@@ -56,9 +63,9 @@ class Ramp:
         self._timeRange = time_range
     
     def exec_(self, x):
-        if self._mode is 'rate':
+        if self._mode == 'rate':
             m = self._slope
-        elif self._mode is 'ps':
+        elif self._mode == 'ps':
             m = (self._endVal - self._startVal)/(self._timeRange[1] - self._timeRange[0])
         
         return m*(x - self._timeRange[0]) + self._startVal
