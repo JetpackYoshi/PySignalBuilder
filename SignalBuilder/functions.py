@@ -63,9 +63,9 @@ class Ramp:
         self._timeRange = time_range
     
     def exec_(self, x):
-        if self._mode is 'rate':
+        if self._mode == 'rate':
             m = self._slope
-        elif self._mode is 'ps':
+        elif self._mode == 'ps':
             m = (self._endVal - self._startVal)/(self._timeRange[1] - self._timeRange[0])
         
         return m*(x - self._timeRange[0]) + self._startVal
